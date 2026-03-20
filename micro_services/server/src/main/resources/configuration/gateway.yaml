@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    config:
+      enabled: true
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: student-service
+              uri: lb://student-service
+              predicates:
+                - Path=/api/v1/students/**,/api/v1/students
+
+            - id: school
+              uri: lb://school
+              predicates:
+                - Path=/api/v1/schools/**,/api/v1/schools
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+
+server:
+  port: 8111
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+      access: unrestricted
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0   
+
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
